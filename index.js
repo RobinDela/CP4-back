@@ -5,7 +5,7 @@ const express = require('express');
 const { db } = require('./conf');
 
 const app = express();
-app.use(express.static('sample'));
+app.use(express.static('samples'));
 app.use(express.json());
 app.use(cors());
 app.use(
@@ -28,6 +28,15 @@ app.get('/answer/:id', async (req, res) => {
   res.json(results);
 });
 
+app.post('/answer', async (req, res) => {
+  const { title, band } = req.body;
+  const sql = 'INSERT INTO answer (title, band) VALUES(?,?)';
+  const sqlValues = [title, band];
+
+  const [results] = await db.query(sql, sqlValues);
+  res.status(201).json(results);
+});
+
 app.get('/samplesent', async (req, res) => {
   const sql = 'SELECT * FROM samplesent';
   const [results] = await db.query(sql);
@@ -44,7 +53,7 @@ app.get('/samplesent/:id', async (req, res) => {
 
 app.post('/samplesent', async (req, res) => {
   // const { core } = req.files;
-  console.log(`${JSON.stringify(req.files.sample.name)}`);
+  console.log(req.files);
 
   fs.writeFile(
     `./samples/${req.files.sample.md5}.wav`,
@@ -76,5 +85,5 @@ app.post('/samplesent', async (req, res) => {
 });
 
 app.listen(5050, () => {
-  console.log('DB humming man run on http://localhost:5050 !');
+  console.log('DB hum it run on http://localhost:5050 !');
 });
